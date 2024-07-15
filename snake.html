@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        #custom-alert {
+            display: none;
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        #custom-alert.show {
+            display: block;
+            opacity: 1;
+        }
+
+        #sidebar {
+            width: 250px;
+            height: 100%;
+            border: 1px solid #ccc;
+            /* background-color: #f1f1f1; */
+            color: #060505;
+            position: absolute;
+            top: -30px;
+            left: 350px;
+            padding: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+
+        }
+
+        #leftsider {
+            width: 250px;
+            height: 150px;
+            border: 1px solid #ccc;
+            /* background-color: #f1f1f1; */
+            color: #060505;
+            position: absolute;
+            top: 40px;
+            left: 50px;
+            padding: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+
+        }
+
+        #buttom {
+            width: 360px;
+            height: 100px;
+            border: 1px solid #ccc;
+            /* background-color: #f1f1f1; */
+            color: #060505;
+            position: absolute;
+            top: 500px;
+            left: 530px;
+            padding: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+
+        }
+
+        /* * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+
+        } */
+
+        #main {
+            height: 420px;
+            width: 360px;
+            border: 10px #000 solid;
+            background-color: #b7d4a8;
+            margin: 50px auto;
+        }
+
+        #stage {
+            width: 304px;
+            height: 304px;
+            border: 2px solid #000;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        #info {
+            width: 304px;
+            margin: 30px auto;
+            display: flex;
+            justify-content: space-between;
+            font: bold 15px courier;
+        }
+
+        #snake>div {
+            width: 10px;
+            height: 10px;
+            background-color: #000;
+            position: absolute;
+            border: 0.1px solid #b7d4a8
+        }
+
+        #food {
+            width: 10px;
+            height: 10px;
+            background-color: #780c27;
+            position: absolute;
+            top: 100px;
+            left: 120px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main">
+        <div id="stage">
+            <div id="snake">
+
+                <div></div>
+
+            </div>
+            <div id=food></div>
+            <div id="sidebar">
+                <p>Hi here are rules for snake game,the initial score is 0, level is 1, when score up to 5, back it to
+                    0, and the scake speed will faster and faster as the level increase, Snakes cannot turn back, cannot
+                    touch itself, and the game fails when hitting a wall </p>
+
+                嗨,以下是游戏规则,初始分数是0,等级是1,每当分数到5时,等级升级,分数清零,速度会越来越快,蛇不可以回头,不可以碰到自己,撞墙时游戏失败
+            </div>
+        </div>
+
+        <div id="info">
+            <div>Score:<span id="score">0</span></div>
+            <div>Level:<span id="level">1</span></div>
+
+        </div>
+
+        <div id="leftsider">
+            <h2>Jackasher:
+
+            </h2>
+            <p>
+                一个简单的贪吃蛇游戏,右方是游戏规则,下方是具体数据记录
+            </p>
+        </div>
+
+        <div id="buttom">HIiiii</div>
+
+
+
+
+    </div>
+
+
+
+
+
+    <script>
+
+        const snake = document.getElementById("snake")
+        const snakes = snake.getElementsByTagName("div")
+        const head = snakes[0]
+
+        const food = document.getElementById("food")
+
+        const scoreSpan = document.getElementById('score')
+
+        const levelSpan = document.getElementById('level')
+
+        let score = 0
+        let level = 1
+        let initspeed = 50
+
+
+        let dir
+        let keyActive = true
+
+        //当吃到食物时改变食物坐标
+        function changeFood() {
+            const x = (Math.floor(Math.random() * 30)) * 10
+            const y = (Math.floor(Math.random() * 30)) * 10
+            console.log(x, y);
+            food.style.left = x + 'px'
+            food.style.right = y + 'px'
+        }
+
+        //该类用于阻止蛇掉头
+        const reObj = {
+            ArrowUp: "ArrowDown",
+            ArrowDown: "ArrowUp",
+            ArrowLeft: "ArrowRight",
+            ArrowRight: "ArrowLeft"
+        }
+
+        let isGameOver = false
+
+
+
+
+        document.addEventListener('keydown', (event) => {
+            //如果按键与方向相同才会继续接受
+            if (reObj[dir] !== event.key && keyActive) {
+                dir = event.key
+                keyActive = false
+            }
+
+        })
+
+
+        //定时无限循环开始,蛇不能停下来
+        setTimeout(function move() {
+
+            // if(score == 5){
+            //     level++
+            //     levelSpan.textContent = level
+            //     scoreSpan.textContent = 0
+            //     initspeed -= 10
+            //     alert('恭喜你通过第一关')
+
+            // }
+
+            keyActive = true
+
+            const head = snakes[0]
+
+            let x = head.offsetLeft
+            let y = head.offsetTop
+
+            switch (dir) {
+                case "ArrowUp":
+                    y = y - 10
+                    console.log("up");
+                    break
+                case "ArrowDown":
+                    y = y + 10
+                    console.log("down");
+                    break
+                case "ArrowLeft":
+                    x = x - 10
+                    console.log("left");
+                    break
+                case "ArrowRight":
+                    console.log("right");
+                    x = x + 10
+                    break
+
+            }
+
+            console.log(dir);
+
+
+            if (head.offsetLeft === food.offsetLeft && head.offsetTop === food.offsetTop) {
+                console.log("吃到食物了");
+                changeFood()
+
+
+                score++
+
+                scoreSpan.textContent = score
+
+                levelUp()
+                snake.insertAdjacentHTML("beforeend", "<div/>");
+            }
+
+            if (x < 0 || x > 290 || y < 0 || y > 290) {
+                alert('Game Over!')
+                isGameOver = true
+                location.reload()
+
+            }
+
+            //如果任何一个蛇身坐标和当前蛇头重合,游戏结束
+
+            for (let index = 0; index < snakes.length - 1; index++) {
+                if (snakes[index].offsetLeft === x && snakes[index].offsetTop === y) {
+
+                    isGameOver = true
+                    alert("撞到自己了!")
+                    location.reload()
+                }
+            }
+
+
+
+            //按下方向键后,这个蛇尾巴会接受坐标,并且成为蛇头,其他部位保持不动
+            const tail = snakes[snakes.length - 1]
+            tail.style.left = x + "px"
+            tail.style.top = y + "px"
+
+            snake.insertAdjacentElement("afterbegin", tail)
+
+
+
+
+
+            //撞墙游戏结束
+            !isGameOver && setTimeout(move, initspeed)
+        }, initspeed)
+
+
+        function levelUp() {
+            if (score == 5) {
+                score = 0;
+                level++;
+                scoreSpan.textContent = score
+                levelSpan.textContent = level
+
+                initspeed -= 10
+
+            }
+        }
+
+        function showAlert() {
+            var alert = document.getElementById("custom-alert");
+            alert.classList.add("show");
+            setTimeout(function () {
+                alert.style.display = "block";
+
+                closeAlert()
+            }, 10);
+        }
+
+        function closeAlert() {
+            var alert = document.getElementById("custom-alert");
+            alert.classList.remove("show");
+            setTimeout(function () {
+                alert.style.display = "none";
+            }, 500);
+        }
+    </script>
+
+</body>
+
+</html>
